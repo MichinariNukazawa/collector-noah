@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collector Noah</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Collector Noah</h1>
+        <span id="state" class="state">…</span>
+      </header>
+
+      <div class="stats">
+        <div><span>今日</span><strong id="today">0</strong></div>
+        <div><span>未送信</span><strong id="pending">0</strong></div>
+      </div>
+
+      <p id="collector" class="collector">受信アプリを確認中…</p>
+      <p id="lastReceived" class="collector">受信した記録はまだありません</p>
+      <div id="gap-warnings" role="status">
+        <div id="gap-details" hidden>
+          <ul id="gap-reasons"></ul>
+          <p id="gap-recovery">対象のページを再読み込みしてください。警告が続く場合は「問題報告用レポートの完全版」を選び、「問題を報告」から診断を保存してください。</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="pause" type="button">一時停止</button>
+        <button id="settings" type="button" class="secondary">設定</button>
+      </div>
+
+      <label class="full-report"><input id="full-report" type="checkbox" /> 問題報告用レポートの完全版（ローカル保存のみ）</label>
+      <p class="full-report-note" id="full-report-note" hidden>完全版にはページURL・アダプタ設定・セレクタ詳細・Collectorの直近イベント・欠落の警告履歴が含まれます。個人情報・閲覧情報が含まれる場合があるので、渡す先に注意してください。</p>
+      <button id="report" type="button" class="primary">問題を報告</button>
+      <button id="retry" type="button" class="secondary" hidden>
+        未送信を再送
+      </button>
+      <button id="clear" type="button" class="secondary" hidden>
+        未送信をクリア
+      </button>
+      <button id="healthRetry" type="button" class="secondary" hidden>
+        再接続
+      </button>
+      <button id="download" type="button" class="secondary" hidden>
+        レポートをダウンロード
+      </button>
+
+      <p id="message" class="message" role="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

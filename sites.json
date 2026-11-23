@@ -1,0 +1,182 @@
+{
+  "x": {
+    "label": "X",
+    "hosts": ["x.com", "twitter.com", "pbs.twimg.com"],
+    "matches": ["*://x.com/*", "*://twitter.com/*"],
+    "surfacePatterns": [
+      { "pattern": "^/home$", "surface": "timeline" },
+      { "pattern": "/status/", "surface": "detail" },
+      { "pattern": "^/search", "surface": "search" }
+    ],
+    "actions": [
+      {
+        "action": "like",
+        "selectors": [
+          "[data-testid=\"like\"]"
+        ],
+        "removal": { "attribute": "aria-pressed" }
+      },
+      {
+        "action": "save",
+        "selectors": [
+          "[data-testid=\"bookmark\"]"
+        ],
+        "removal": { "attribute": "aria-pressed" }
+      }
+    ],
+    "containerSelectors": ["article"],
+    "imageSelector": "img",
+    "imageUrlPattern": "/media/",
+    "maxImages": 4,
+    "tagSelectors": [".tag"],
+    "bodySelector": "article p",
+    "authorSelector": ".author-name",
+    "authorIdPattern": "x\\.com/([A-Za-z0-9_]+)",
+    "comment": {
+      "submitSelectors": ["[data-testid=\"tweetButton\"]"],
+      "resultSelectors": [".own-comment"],
+      "resultBodySelector": ".comment-body",
+      "confirmTimeoutMs": 3000
+    },
+    "item": {
+      "type": "post",
+      "urlSelector": "a[href*=\"/status/\"]",
+      "idPattern": "/status/(\\d+)"
+    }
+  },
+  "pixiv": {
+    "label": "Pixiv",
+    "hosts": ["pixiv.net", "i.pximg.net"],
+    "matches": ["*://www.pixiv.net/*"],
+    "pageApi": "pixiv",
+    "imageSize": "regular",
+    "surfacePatterns": [
+      { "pattern": "/artworks/", "surface": "detail" }
+    ],
+    "actions": [
+      {
+        "action": "like",
+        "selectors": [
+          "button[title=\"いいね\"]",
+          "button[aria-label*=\"いいね\"]"
+        ],
+        "texts": ["いいね"]
+      },
+      {
+        "action": "save",
+        "selectors": [
+          "button[title=\"ブックマーク\"]",
+          "a[title=\"ブックマーク\"]",
+          "button[aria-label*=\"ブックマーク\"]",
+          "[data-click-action=\"bookmark\"]"
+        ],
+        "texts": ["ブックマーク"]
+      }
+    ],
+    "containerSelectors": ["figure", "main", "[role=\"main\"]"],
+    "imageSelector": "img",
+    "maxImages": 1,
+    "tagSelectors": [".tag"],
+    "bodySelector": ".caption",
+    "authorSelector": ".author-name",
+    "authorIdPattern": "/users/(\\d+)",
+    "item": {
+      "type": "artwork",
+      "idPattern": "/artworks/(\\d+)"
+    }
+  },
+  "danbooru": {
+    "label": "Danbooru",
+    "hosts": ["danbooru.donmai.us", "cdn.donmai.us"],
+    "matches": ["*://danbooru.donmai.us/*"],
+    "actions": [
+      {
+        "action": "save",
+        "selectors": ["#fav-button", "a.fav", "button.fav"]
+      }
+    ],
+    "containerSelectors": ["main", "#post-view"],
+    "imageSelector": "#image, img",
+    "maxImages": 1,
+    "tagSelectors": [".tag", "a.search-tag"],
+    "bodySelector": "#post-description, .post-body",
+    "authorSelector": "a.user, .post-approver",
+    "authorIdPattern": "/users/(\\d+)",
+    "item": {
+      "type": "post",
+      "urlSelector": "a[href*=\"/posts/\"]",
+      "idPattern": "/posts/(\\d+)"
+    }
+  },
+  "dmm": {
+    "label": "DMM / FANZA",
+    "hosts": ["dmm.co.jp", "pics.dmm.co.jp"],
+    "matches": ["*://*.dmm.co.jp/*"],
+    "actions": [
+      {
+        "action": "save",
+        "selectors": ["a.addToFavorite__btn.fn-addToBookmark"]
+      }
+    ],
+    "imageSelector": "img",
+    "imageUrlPattern": "(pics|doujin-assets)\\.dmm\\.co\\.jp",
+    "maxImages": 1,
+    "item": {
+      "type": "product",
+      "urlSelector": "a[href*=\"/detail/\"]",
+      "idPattern": "cid=([A-Za-z0-9_]+)"
+    }
+  },
+  "dlsite": {
+    "label": "DLsite",
+    "hosts": ["dlsite.com", "www.dlsite.com", "img.dlsite.jp"],
+    "matches": ["*://www.dlsite.com/*"],
+    "actions": [
+      {
+        "action": "save",
+        "selectors": ["a.btn_favorite:not(.btn_favorite_in)"]
+      },
+      {
+        "action": "follow",
+        "selectors": ["a.btn_follow"]
+      }
+    ],
+    "imageSelector": "img",
+    "imageUrlPattern": "img\\.dlsite\\.jp",
+    "maxImages": 1,
+    "item": {
+      "type": "product",
+      "urlSelector": "a[href*=\"product_id/\"]",
+      "idPattern": "product_id/([A-Za-z0-9]+)"
+    }
+  },
+  "melonbooks": {
+    "label": "Melonbooks",
+    "hosts": ["melonbooks.co.jp", "melonbooks.akamaized.net"],
+    "matches": ["*://*.melonbooks.co.jp/*"],
+    "actions": [
+      {
+        "action": "follow",
+        "selectors": [
+          "a.fav-button--favorite",
+          "a.fav-button.fav-button--favorite"
+        ]
+      },
+      {
+        "action": "save",
+        "selectors": [
+          "a.fav-button--wishlist",
+          "a.fav-button.fav-button--wishlist"
+        ]
+      }
+    ],
+    "imageSelector": "img",
+    "imageUrlPattern": "akamaized\\.net",
+    "maxImages": 1,
+    "item": {
+      "type": "product",
+      "urlSelector": "a[href*=\"detail.php?product_id=\"]",
+      "idPattern": "product_id=(\\d+)"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Collector Noah 設定</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Collector Noah 設定</h1>
+      <p class="sub">クリック・別タブ・いいね・保存を、ローカルの受信アプリに送ります。</p>
+
+      <label>
+        Endpoint
+        <input id="endpoint" type="url" placeholder="http://127.0.0.1:8765" />
+      </label>
+
+      <label>
+        Token
+        <input id="token" type="password" placeholder="~/.local/share/collector-noah/token の中身" />
+      </label>
+
+      <label class="row">
+        <input id="enabled" type="checkbox" />
+        収集を有効にする
+      </label>
+
+      <label class="row">
+        <input id="inventory" type="checkbox" />
+        操作要素の種類・属性を、設計改善のため送る（既定OFF）
+      </label>
+
+      <label class="row">
+        <input id="sampling" type="checkbox" />
+        表示された画像の一部を、閲覧傾向の把握のため送る（既定OFF）
+      </label>
+
+      <fieldset>
+        <legend>拾うサイト</legend>
+        <div id="sites"></div>
+      </fieldset>
+
+      <div class="actions">
+        <button id="save" type="button">保存</button>
+        <button id="test" type="button" class="secondary">接続テスト</button>
+      </div>
+
+      <p id="status" class="status" role="status"></p>
+
+      <details>
+        <summary>使い方</summary>
+        <ol>
+          <li>Collector Noah は collector-noah.service で常駐します。稼働確認: <code>systemctl --user is-active collector-noah.service</code></li>
+          <li><code>~/.local/share/collector-noah/token</code> を開き、中身を上の Token に入力する</li>
+          <li>手動起動が必要な場合: noah ディレクトリで <code>python3 -m collector.server --no-download</code></li>
+          <li>Chromeは <code>chrome://extensions</code> で <code>dist/chrome</code> を読み込む</li>
+          <li>Firefoxは <code>about:debugging</code> で <code>dist/firefox/manifest.json</code> を読み込む</li>
+        </ol>
+        <p class="note">
+          Firefoxの一時アドオンは再起動で消えます。常用するには署名が必要です。
+        </p>
+      </details>
+
+      <p class="note">
+        ページの内容やCookieは送りません。送るのは画像URL、ページURL、操作、時刻に加え、付随テキスト（ツイート文など、最大2,000字）、サイトのタグ、作者名/ID、本人のコメント本文です。すべてローカルの受信アプリに保存されます。
+        操作要素（棚卸し）は、ボタンやリンクの属性（種別・class・aria-label・件数）だけを送ります。
+        閲覧サンプルは、許可したサイトで表示された画像の一部（重複除去した候補の10%・100件/日・30日保持）だけを送ります。
+        棚卸し・サンプルは診断や通常収集とは別の経路で送られます。
+        収集は許可したサイトだけで動きます。
+      </p>
+    </main>
+    <script src="sites.generated.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

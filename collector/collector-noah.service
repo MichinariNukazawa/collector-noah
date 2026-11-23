@@ -1,0 +1,15 @@
+[Unit]
+Description=Collector Noah (local receiver)
+After=network.target
+
+[Service]
+Type=simple
+UMask=0077
+# WorkingDirectory は clone 先に合わせて書き換えること
+WorkingDirectory=%h/projects/noah
+ExecStart=/usr/bin/python3 -m collector.server --no-download
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

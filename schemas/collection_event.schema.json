@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atelier.local/schemas/collection_event.schema.json",
+  "title": "CollectionEvent",
+  "description": "ブラウザ拡張やフォルダ監視から届く、投稿・作品・商品単位の生の記録。意味づけはしない。schema 3 は技術仕様 §7.6 の確定範囲（2026-11-12 決定）。旧 v2 の読取は受信側が維持する。",
+  "type": "object",
+  "required": ["schema", "source", "action", "item"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "description": "契約の版。拡張は 3 を送る。受信側は旧 2 の読取を維持する。",
+      "enum": [2, 3]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "x",
+        "twitter",
+        "pixiv",
+        "danbooru",
+        "dmm",
+        "melonbooks",
+        "dlsite",
+        "folder",
+        "other"
+      ]
+    },
+    "site": {
+      "type": "string",
+      "maxLength": 200,
+      "default": ""
+    },
+    "action": {
+      "type": "string",
+      "enum": ["seen", "like", "save", "bookmark", "click", "open", "comment", "follow"]
+    },
+    "route": {
+      "description": "観測経路。旧記録の metadata.via の正式化（§7.6 D-1）。存在しない旧記録は受信側が metadata.via から昇格する。",
+      "type": "string",
+      "enum": ["image_click", "item_link", "tab", "action", "page_collect", "context_menu", "sample"]
+    },
+    "status": {
+      "description": "成立と押下の区別（§7.6 D-2）。pressed=押下のみ。confirmed=サイトの表示から成立を確認。unknown=旧記録・成立未確認。押下でない経路では省略し、省略は unknown として扱う。",
+      "type": "string",
+      "enum": ["pressed", "confirmed", "unknown"]
+    },
+    "item": {
+      "type": "object",
+      "description": "行動の対象。投稿・作品・商品・単体画像。",
+      "required": ["type", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["post", "artwork", "product", "image", "folder"]
+        },
+        "id": {
+          "type": ["string", "null"],
+          "maxLength": 200
+        },
+        "url": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 300,
+          "default": ""
+        },
+        "page_count": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "body": {
+          "description": "対象そのものに付随する本文（投稿文・キャプション・説明文）。対象コンテナ内の本文要素に限る。ページ全体の本文・ナビ・関係のない記事は対象外（FR-21・2026-11-12 決定 P1）。",
+          "type": "string",
+          "maxLength": 2000
+        },
+        "body_truncated": {
+          "description": "本文が上限で切り詰められた事実。切り詰めたときだけ true を付ける。",
+          "type": "boolean",
+          "const": true
+        },
+        "tags": {
+          "description": "サイトが付けた構造化タグ。自由文からの推定はしない（FR-22・決定 P2）。最大30個・1個あたり50字。",
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "string",
+            "maxLength": 50
+          }
+        },
+        "tags_truncated": {
+          "description": "タグが個数または長さの上限で切り詰められた事実。切り詰めたときだけ true を付ける。",
+          "type": "boolean",
+          "const": true
+        },
+        "author": {
+          "description": "対象の作者。ID はページの構造化データまたは URL から追加通信なしに取れるサイトだけ（FR-23・決定 P3）。診断・棚卸しには入れない。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "id": {
+              "type": ["string", "null"],
+              "maxLength": 200
+            },
+            "truncated": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        }
+      }
+    },
+    "images": {
+      "type": "array",
+      "description": "item に属する画像。順序はサイトの表示順。",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["url"],
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "width": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "height": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "variant": {
+            "description": "版の区別（§7.6 A-3）。displayed=表示に使われた版。original=原寸。判定できない場合は displayed と正直に記録する。",
+            "type": "string",
+            "enum": ["displayed", "original"]
+          },
+          "targeted": {
+            "description": "行動が向けられた画像（§7.6 C-3）。対象が自明の経路ではその画像に true。対象不明は全画像 false。",
+            "type": "boolean"
+          },
+          "hash": {
+            "type": ["string", "null"],
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "path": {
+            "type": ["string", "null"],
+            "maxLength": 2000
+          },
+          "content_type": {
+            "type": ["string", "null"],
+            "maxLength": 100
+          },
+          "download_error": {
+            "description": "画像が欠けた理由。語彙は §7.6 の表（not_displayed / cors_blocked / size_limit / encode_failed / invalid_image_data / image_write_failed / 取得元のエラー文）で共通化する。",
+            "type": ["string", "null"],
+            "maxLength": 500
+          },
+          "data": {
+            "type": ["string", "null"],
+            "description": "Base64-encoded image bytes sent to the local Collector. Persisted records use the image hash instead.",
+            "maxLength": 900000
+          },
+          "blob": {
+            "type": ["string", "null"]
+          },
+          "base64": {
+            "type": ["string", "null"]
+          },
+          "content": {
+            "type": ["string", "null"]
+          },
+          "image_data": {
+            "type": ["string", "null"]
+          },
+          "data_url": {
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "comment": {
+      "description": "本人が対象に送ったコメントの本文（FR-11・決定 P4）。送信の成立がサイト表示から確認できた場合だけ付ける。本文は送信済みの状態でページに表示された DOM から取る。入力中の値・フォーム値は経由しない。他人のコメントは対象外。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "truncated": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "removed": {
+      "description": "いいね・保存の解除の事実（FR-1 改訂・決定 P5）。解除の状態変化を確実に観測できた場合にだけ true を付ける。false は使わず、観測できない解除は欄を設けない。",
+      "type": "boolean",
+      "const": true
+    },
+    "search_term": {
+      "description": "検索ホストの検索結果ページに限る検索語（FR-24・決定 P7）。結果ページに表示された語と URL の検索語。フォームの入力値は取らない。検索ホスト・パラメータの定義は技術仕様 §6.9。本契約では欄のみ確定（実装は別回）。",
+      "type": "string",
+      "maxLength": 200
+    },
+    "surface": {
+      "description": "表示面の分類（§7.6 G-1）。URL パターンから分類できる範囲に限る。分類できないときは欄を設けない。",
+      "type": "string",
+      "maxLength": 40
+    },
+    "dwell_seconds": {
+      "description": "可視だった秒数の実測（§7.6 E-3）。閲覧サンプルの seen に付ける。",
+      "type": "number",
+      "minimum": 0
+    },
+    "sampling": {
+      "description": "閲覧サンプルの採取条件と集計（§7.6 F-1）。via=sample の seen イベントに付ける。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capped": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "collector": {
+      "description": "データを生成した拡張の自己記述（§7.6 H-2）。利用側が経緯を知らずにデータを解釈できるようにする。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "extension_version": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "build_hash": {
+          "type": "string",
+          "maxLength": 64
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "default": {},
+      "additionalProperties": true
+    }
+  }
+}
